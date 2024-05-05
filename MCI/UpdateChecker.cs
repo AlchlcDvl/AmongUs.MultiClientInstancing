@@ -9,13 +9,13 @@ namespace MCI;
 
 public static class UpdateChecker
 {
-    public static bool needsUpdate;
+    public static bool NeedsUpdate;
 
     public static async void CheckForUpdate()
     {
         try
         {
-            needsUpdate = await TaskUpdate();
+            NeedsUpdate = await TaskUpdate();
         } catch {}
     }
 

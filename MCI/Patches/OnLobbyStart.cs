@@ -14,7 +14,6 @@ public static class OnLobbyStart
             var count = InstanceControl.Clients.Count;
             InstanceControl.Clients.Clear();
             InstanceControl.PlayerClientIDs.Clear();
-            InstanceControl.SavedPositions.Clear();
 
             for (var i = 0; i < count; i++)
                 InstanceControl.CreatePlayerInstance();

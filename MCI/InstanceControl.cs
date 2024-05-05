@@ -11,7 +11,6 @@ public static class InstanceControl
 {
     internal static Dictionary<int, ClientData> Clients = new();
     internal static Dictionary<byte, int> PlayerClientIDs = new();
-    internal static Dictionary<byte, Vector2> SavedPositions = new();
     public static PlayerControl CurrentPlayerInPower { get; private set; }
 
     public static int AvailableId()
@@ -27,7 +26,6 @@ public static class InstanceControl
 
     public static void SwitchTo(byte playerId)
     {
-        SavedPositions[PlayerControl.LocalPlayer.PlayerId] = PlayerControl.LocalPlayer.transform.position;
         PlayerControl.LocalPlayer.NetTransform.RpcSnapTo(PlayerControl.LocalPlayer.transform.position);
         PlayerControl.LocalPlayer.moveable = false;
 
@@ -40,6 +38,10 @@ public static class InstanceControl
         if (newPlayer == null)
             return;
 
+        var savedPlayer = PlayerControl.LocalPlayer;
+
+        var pos = PlayerControl.LocalPlayer.transform.position;
+        var pos2 = newPlayer.transform.position;
         PlayerControl.LocalPlayer = newPlayer;
         PlayerControl.LocalPlayer.lightSource = light;
         PlayerControl.LocalPlayer.moveable = true;
@@ -78,12 +80,8 @@ public static class InstanceControl
         KillAnimation.SetMovement(newPlayer, true);
         newPlayer.MyPhysics.inputHandler.enabled = true;
         CurrentPlayerInPower = newPlayer;
-
-        if (SavedPositions.TryGetValue(playerId, out var pos))
-            newPlayer.NetTransform.RpcSnapTo(pos);
-
-        if (SavedPositions.TryGetValue(savedId, out var pos2))
-            PlayerById(savedId).NetTransform.RpcSnapTo(pos2);
+        newPlayer.NetTransform.SnapTo(pos2);
+        savedPlayer.NetTransform.SnapTo(pos);
 
         if (MeetingHud.Instance)
         {
@@ -100,7 +98,6 @@ public static class InstanceControl
         {
             Clients.Clear();
             PlayerClientIDs.Clear();
-            SavedPositions.Clear();
         }
     }
 
@@ -158,7 +155,6 @@ public static class InstanceControl
         var clientId = Clients.FirstOrDefault(x => x.Value.Character.PlayerId == id).Key;
         Clients.Remove(clientId, out var outputData);
         PlayerClientIDs.Remove(id);
-        SavedPositions.Remove(id);
         AmongUsClient.Instance.RemovePlayer(clientId, DisconnectReasons.Custom);
         AmongUsClient.Instance.allClients.Remove(outputData);
     }
@@ -175,6 +171,8 @@ public static class InstanceControl
         __instance.amDead = false;
         __instance.SkipVoteButton.gameObject.SetActive(true);
         __instance.SkipVoteButton.AmDead = false;
-        __instance.Glass.gameObject.SetActive(false);
+
+        if (CacheGlassSprite.Cache)
+            __instance.Glass.sprite = CacheGlassSprite.Cache;
     }
 }

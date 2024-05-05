@@ -24,7 +24,7 @@ public static class PingTracker_Update
             __instance.text.text += (SubmergedCompatibility.Loaded && GameOptionsManager.Instance.currentNormalGameOptions.MapId == 5) ? " <color=#00ccccFF>[Submerged]</color>" : " ";
         }
 
-        if (UpdateChecker.needsUpdate)
+        if (UpdateChecker.NeedsUpdate)
             __instance.text.text += " - <color=#ff0000FF>UPDATE AVAILABLE</color>";
 
         __instance.text.text += "\n    by MyDragonBreath, whichTwix, AlchlcSystm";
